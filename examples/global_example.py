@@ -18,12 +18,13 @@ if __name__ == '__main__':
     graph search
     '''
     # build environment
-    start = (5, 5)
-    goal = (45, 25)
-    env = Grid(51, 31)
+    start = (50, 60)
+    goal = (90, 70)
+    env = Grid(120, 100)
 
     # creat planner
-    # planner = search_factory("a_star", start=start, goal=goal, env=env)
+    planner = search_factory("a_star", start=start, goal=goal, env=env)
+
     # planner = search_factory("dijkstra", start=start, goal=goal, env=env)
     # planner = search_factory("gbfs", start=start, goal=goal, env=env)
     # planner = search_factory("theta_star", start=start, goal=goal, env=env)
@@ -37,7 +38,7 @@ if __name__ == '__main__':
     #                             max_edge_len=10.0, inflation_r=1.0)
 
     # animation
-    # planner.run()
+    planner.run()
 
     # ========================================================
 
@@ -64,5 +65,5 @@ if __name__ == '__main__':
     evolutionary search
     '''
     # planner = search_factory("aco", start=start, goal=goal, env=env)
-    planner = search_factory("pso", start=start, goal=goal, env=env)
-    planner.run()
+    #planner = search_factory("pso", start=start, goal=goal, env=env)
+    #planner.run()

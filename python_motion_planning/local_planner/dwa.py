@@ -55,11 +55,20 @@ class DWA(LocalPlanner):
         self.v_resolution = v_resolution
         self.w_resolution = w_resolution
 
-        # global planner
+        # global planner，设置全局规划
         g_start = (start[0], start[1])
+        print("g_start",g_start)
+
         g_goal  = (goal[0], goal[1])
+        print("g_goal", g_goal)
         self.g_planner = {"planner_name": "a_star", "start": g_start, "goal": g_goal, "env": env}
+
+        self.path = [(35, 25), (35, 24), (34, 23), (34, 22), (34, 21), (33, 20), (32, 19), (32, 18), (31, 17), (31, 16), (31, 15),
+         (31, 14), (30, 14), (29, 14), (28, 14), (27, 15), (26, 16), (25, 16), (24, 16), (23, 16), (22, 16), (21, 16),
+         (20, 16), (19, 16), (18, 16), (17, 16), (16, 16), (15, 16), (14, 16), (13, 16), (12, 16), (11, 16), (10, 16),
+         (9, 16), (9, 15), (9, 14), (9, 13), (9, 12), (8, 11), (7, 10), (6, 9), (5, 8), (5, 7), (5, 6), (5, 5)]
         self.path = self.g_path[::-1]
+        print('reversed path',self.path)
 
     def __str__(self) -> str:
         return "Dynamic Window Approach(DWA)"

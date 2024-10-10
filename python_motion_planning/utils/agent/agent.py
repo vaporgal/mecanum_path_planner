@@ -65,7 +65,7 @@ class Robot(Agent):
     def __str__(self) -> str:
         return "Robot"
     
-    def kinematic(self, u: np.ndarray, dt: float, replace: bool = True):
+    def  kinematic(self, u: np.ndarray, dt: float, replace: bool = True):
         """
         Run robot kinematic once.
 

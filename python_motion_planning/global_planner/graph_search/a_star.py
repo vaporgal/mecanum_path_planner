@@ -61,6 +61,7 @@ class AStar(GraphSearcher):
             if node == self.goal:
                 CLOSED[node.current] = node
                 cost, path = self.extractPath(CLOSED)
+                print("path",path)
                 return cost, path, list(CLOSED.values())
 
             for node_n in self.getNeighbor(node):                
@@ -122,3 +123,8 @@ class AStar(GraphSearcher):
         """
         cost, path, expand = self.plan()
         self.plot.animation(path, str(self), cost, expand)
+        return path
+if __name__ == "__main__":
+    import python_motion_planning as pmp
+    planner = pmp.AStar((5, 5), (45, 25), pmp.Grid(51, 31))
+    planner.run()

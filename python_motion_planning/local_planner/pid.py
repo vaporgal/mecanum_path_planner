@@ -33,7 +33,7 @@ class PID(LocalPlanner):
     """
     def __init__(self, start: tuple, goal: tuple, env: Env, heuristic_type: str = "euclidean",
                  k_v_p: float = 1.00, k_v_i: float = 0.10, k_v_d: float = 0.10,
-                 k_w_p: float = 1.00, k_w_i: float = 0.10, k_w_d: float = 0.10,
+                 k_w_p: float = 1.00, k_w_i: float = 0.10, k_w_d: float = 0.10, #weight
                  k_theta: float = 0.75, **params) -> None:
         super().__init__(start, goal, env, heuristic_type, MIN_LOOKAHEAD_DIST=0.75, **params)
         # PID parameters
@@ -60,15 +60,15 @@ class PID(LocalPlanner):
             flag (bool): planning successful if true else failed
             pose_list (list): history poses of robot
         """
-        dt = self.params["TIME_STEP"]
-        for _ in range(self.params["MAX_ITERATION"]):
+        dt = self.params["TIME_STEP"] #dt是每个timestep
+        for _ in range(self.params["MAX_ITERATION"]):#在迭代范围之内
             # break until goal reached
             if self.reachGoal(tuple(self.robot.state.squeeze(axis=1)[0:3]), self.goal):
-                return True, self.robot.history_pose
+                return True, self.robot.history_pose #history是一个很长的矩阵,形状为(start), (5.0, 5.0, 0.15707963267948966), (5.0, 5.0, 0.3141592653589793), ....(goal)
             
             # find next tracking point
-            lookahead_pt, theta_trj, _ = self.getLookaheadPoint()
-
+            lookahead_pt, theta_trj, _ = self.getLookaheadPoint()#找到下一个点
+            #lookahead_pt, theta_trj 分别代表： 应该朝向的下一个目标点，需要转向的角度
             # desired angle
             theta_err = self.angle(self.robot.position, lookahead_pt)
             if abs(theta_err - theta_trj) > np.pi:
@@ -92,8 +92,9 @@ class PID(LocalPlanner):
                 else:
                     v_d = self.dist(lookahead_pt, self.robot.position) / dt
                     u = np.array([[self.linearRegularization(v_d)], [self.angularRegularization(e_theta / dt)]])
-
+                #得出的u是一个二维数组，包含线速度和角速度。
             # feed into robotic kinematic
+            print("u:",u,"dt:",dt)
             self.robot.kinematic(u, dt)
         
         return False, None
@@ -103,11 +104,14 @@ class PID(LocalPlanner):
         Running both plannig and animation.
         """
         _, history_pose = self.plan()
+        print("history_pose: ",history_pose)
         if not history_pose:
             raise ValueError("Path not found and planning failed!")
 
         path = np.array(history_pose)[:, 0:2]
+        print("path: ",path)
         cost = np.sum(np.sqrt(np.sum(np.diff(path, axis=0)**2, axis=1, keepdims=True)))
+        print("cost: ",cost)
         self.plot.plotPath(self.path, path_color="r", path_style="--")
         self.plot.animation(path, str(self), cost, history_pose=history_pose)
 
@@ -144,12 +148,13 @@ class PID(LocalPlanner):
         Returns:
             w (float): control angular velocity output
         """
-        e_w = w_d - self.robot.w
-        self.i_w += e_w * self.params["TIME_STEP"]
+        e_w = w_d - self.robot.w #计算与当前角速度的误差
+        self.i_w += e_w * self.params["TIME_STEP"]  #积分误差，即为所有的误差乘以timestep
         d_w = (e_w - self.e_w) / self.params["TIME_STEP"]
         self.e_w = e_w
 
         w_inc = self.k_w_p * e_w + self.k_w_i * self.i_w + self.k_w_d * d_w
+        #用clamp处理是为了不让他过大或者过小。
         w_inc = MathHelper.clamp(w_inc, self.params["MIN_W_INC"], self.params["MAX_W_INC"])
 
         w = self.robot.w + w_inc
